@@ -104,8 +104,32 @@ function mysolve(model::MyValueIterationModel, problem::MyMDPProblemModel; ϵ::F
     tmp = zeros(Float64, number_of_actions); # temporary storage for action values
     Uold = zeros(Float64, number_of_states); # temporary storage for old value function
 
-    # TODO: Implement the value iteration with convergence checking algorithm
-    throw(ErrorError("Oooops!: You need to implement the value iteration with convergence checking algorithm!"))
+    # Value iteration main loop with convergence checking
+    while (converged == false && counter <= k_max)
+        
+        # Copy current value function to Uold
+        Uold .= U
+        
+        # Update value function for each state
+        for s ∈ problem.𝒮
+            # Compute lookahead value for each action
+            for a ∈ problem.𝒜
+                tmp[a] = _lookahead(problem, Uold, s, a)
+            end
+            # Take maximum over actions
+            U[s] = maximum(tmp)
+        end
+        
+        # Check convergence: max absolute difference between U and Uold
+        δ = maximum(abs.(U .- Uold))
+        
+        if (δ < ϵ)
+            converged = true
+        end
+        
+        # increment counter
+        counter += 1
+    end
 
     return MyValueIterationSolution(problem, U); # wrap and return
 end

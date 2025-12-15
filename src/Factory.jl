@@ -27,8 +27,40 @@ end
 
 # --- PUBLIC API BELOW HERE --------------------------------------------------------------------------------------- #
 
-# Wow! That is slick, how does it work?
-build(model::Type{MySimpleCobbDouglasChoiceProblem}, data::NamedTuple)::MySimpleCobbDouglasChoiceProblem = _build(model, data);
+"""
+    build(model::Type{MySimpleCobbDouglasChoiceProblem}, data::NamedTuple) -> MySimpleCobbDouglasChoiceProblem
+
+Builds a `MySimpleCobbDouglasChoiceProblem` from a `NamedTuple`.
+
+### Arguments
+- `model::Type{MySimpleCobbDouglasChoiceProblem}`: the model type to build
+- `data::NamedTuple`: the data to use to build the model
+
+The `data` `NamedTuple` must contain the following keys:
+- `α::Array{Float64,1}`: preference parameters
+- `c::Array{Float64,1}`: prices
+- `I::Float64`: budget
+- `bounds::Array{Float64,2}`: bounds for the optimization
+- `initial::Array{Float64,1}`: initial guess for the optimization
+
+### Returns
+- `MySimpleCobbDouglasChoiceProblem`: the built Cobb-Douglas choice problem model
+"""
+function build(model::Type{MySimpleCobbDouglasChoiceProblem}, data::NamedTuple)::MySimpleCobbDouglasChoiceProblem
+    
+    # build an empty model -
+    m = model();
+
+    # get data from the named tuple -
+    haskey(data, :α) == false ? m.α = Array{Float64,1}(undef,1) : m.α = data[:α];
+    haskey(data, :c) == false ? m.c = Array{Float64,1}(undef,1) : m.c = data[:c];
+    haskey(data, :I) == false ? m.I = 0.0 : m.I = data[:I];
+    haskey(data, :bounds) == false ? m.bounds = Array{Float64,2}(undef,1,2) : m.bounds = data[:bounds];
+    haskey(data, :initial) == false ? m.initial = Array{Float64,1}(undef,1) : m.initial = data[:initial];
+    
+    # return -
+    return m;
+end
 
 """
     build(model::Type{MyMDPProblemModel}, data::NamedTuple) -> MyMDPProblemModel
